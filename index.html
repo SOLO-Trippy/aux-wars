@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AUX WARS 🎵</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:#080810; --surface:#10101a; --card:#16161f; --border:#252535;
+    --accent:#ff2d55; --gold:#ffc300; --cyan:#00d4ff; --green:#00e676;
+    --text:#f0f0f8; --muted:#5a5a78; --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;
+    display:flex;align-items:center;justify-content:center;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 60% 40% at 20% 0%,rgba(255,45,85,.08) 0%,transparent 60%),
+               radial-gradient(ellipse 50% 50% at 80% 100%,rgba(0,212,255,.06) 0%,transparent 60%);}
+  .app{position:relative;z-index:1;width:100%;max-width:540px;padding:16px;}
+
+  /* LOGO */
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,14vw,5.5rem);letter-spacing:4px;
+    background:linear-gradient(120deg,var(--accent) 0%,var(--gold) 50%,var(--cyan) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    line-height:1;text-align:center;}
+  .tagline{text-align:center;color:var(--muted);font-size:.7rem;letter-spacing:4px;
+    text-transform:uppercase;margin-bottom:22px;margin-top:2px;}
+
+  /* SCREENS */
+  .screen{display:none;}
+  .screen.active{display:block;animation:fadeUp .3s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+  /* CARD */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;}
+  .card-title{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:1px;margin-bottom:2px;}
+  .card-sub{color:var(--muted);font-size:.82rem;margin-bottom:18px;}
+
+  /* INPUTS */
+  input[type=text]{width:100%;background:var(--surface);border:1px solid var(--border);
+    border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;
+    padding:11px 14px;outline:none;transition:border-color .2s;}
+  input[type=text]:focus{border-color:var(--accent);}
+  input[type=text]::placeholder{color:var(--muted);}
+  .input-row{display:flex;gap:8px;margin-bottom:12px;}
+  .input-row input{flex:1;}
+
+  /* BUTTONS */
+  .btn{cursor:pointer;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;
+    font-weight:700;font-size:.92rem;padding:11px 20px;transition:all .18s;white-space:nowrap;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover:not(:disabled){background:#ff4d6d;transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,45,85,.35);}
+  .btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border);}
+  .btn-secondary:hover:not(:disabled){border-color:var(--cyan);color:var(--cyan);}
+  .btn-gold{background:var(--gold);color:#000;}
+  .btn-gold:hover:not(:disabled){background:#ffd740;transform:translateY(-2px);}
+  .btn-green{background:var(--green);color:#000;}
+  .btn-full{width:100%;padding:13px;}
+  .btn-lg{font-size:1rem;}
+  .btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
+
+  /* ROOM CODE */
+  .room-code-display{background:var(--surface);border:2px solid var(--gold);border-radius:12px;
+    padding:16px;text-align:center;margin-bottom:16px;}
+  .room-code-display .code{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--gold);
+    letter-spacing:8px;line-height:1;}
+  .room-code-display .code-hint{color:var(--muted);font-size:.75rem;margin-top:4px;}
+
+  /* PLAYERS */
+  .player-list-lobby{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;min-height:36px;}
+  .player-item{display:flex;align-items:center;gap:8px;background:var(--surface);
+    border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.88rem;}
+  .player-item .host-badge{font-size:.65rem;color:var(--gold);border:1px solid rgba(255,195,0,.3);
+    border-radius:4px;padding:1px 6px;margin-left:auto;}
+
+  hr.divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+
+  /* BADGE */
+  .badge{display:inline-block;background:rgba(255,195,0,.1);color:var(--gold);
+    border:1px solid rgba(255,195,0,.25);border-radius:6px;padding:2px 10px;
+    font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+
+  /* CATEGORY GRID */
+  .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+  .cat-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;
+    padding:12px 8px;cursor:pointer;transition:all .18s;text-align:center;}
+  .cat-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* WHEEL */
+  .wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  canvas#wheel{border-radius:50%;box-shadow:0 0 50px rgba(255,45,85,.2);}
+
+  /* PLAYER BOX */
+  .player-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    padding:14px;text-align:center;margin-bottom:16px;}
+  .player-box-name{font-size:1.3rem;font-weight:700;margin:4px 0;}
+
+  /* TIMER */
+  .timer-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin:20px 0;}
+
+  /* VOTE */
+  .vote-option{background:var(--surface);border:2px solid var(--border);border-radius:12px;
+    padding:13px 16px;cursor:pointer;transition:all .18s;display:flex;align-items:center;
+    gap:10px;margin-bottom:8px;font-weight:600;}
+  .vote-option:hover{border-color:var(--cyan);}
+  .vote-option.selected{border-color:var(--accent);background:rgba(255,45,85,.08);}
+  .vote-check{margin-left:auto;color:var(--accent);display:none;}
+  .vote-option.selected .vote-check{display:block;}
+  .vote-option.voted-already{opacity:.5;cursor:not-allowed;}
+
+  /* WAITING */
+  .waiting-list{display:flex;flex-direction:column;gap:6px;margin:12px 0;}
+  .waiting-item{display:flex;align-items:center;justify-content:space-between;
+    background:var(--surface);border-radius:8px;padding:8px 12px;font-size:.85rem;}
+  .waiting-item .status-done{color:var(--green);}
+  .waiting-item .status-wait{color:var(--muted);}
+
+  /* RESULTS */
+  .winner-crown{font-size:3rem;text-align:center;animation:bounce .7s infinite alternate;}
+  @keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+  .winner-name{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--gold);
+    text-align:center;letter-spacing:2px;line-height:1.1;}
+  .winner-sub{text-align:center;color:var(--muted);font-size:.8rem;margin-top:4px;}
+  .result-row{margin-bottom:16px;}
+  .result-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+  .result-name{font-weight:700;}
+  .result-votes{color:var(--gold);font-size:.82rem;font-weight:700;}
+  .result-bar-bg{background:var(--surface);border-radius:99px;height:8px;overflow:hidden;}
+  .result-bar-fill{height:100%;border-radius:99px;
+    background:linear-gradient(90deg,var(--accent),var(--gold));width:0;transition:width 1s cubic-bezier(.4,0,.2,1);}
+  .result-link{color:var(--cyan);font-size:.72rem;text-decoration:none;margin-top:3px;display:inline-block;}
+  .result-link:hover{text-decoration:underline;}
+
+  /* NOTICE */
+  .notice{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:8px;
+    color:var(--cyan);font-size:.8rem;padding:8px 12px;margin-bottom:10px;text-align:center;}
+  .error-box{background:rgba(255,45,85,.08);border:1px solid rgba(255,45,85,.2);border-radius:8px;
+    color:var(--accent);font-size:.8rem;padding:8px 12px;margin-bottom:10px;text-align:center;}
+
+  /* YT LINK */
+  .yt-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .yt-box a{color:var(--cyan);font-size:.83rem;text-decoration:none;flex:1;word-break:break-all;}
+  .yt-box a:hover{text-decoration:underline;}
+
+  @media(max-width:440px){
+    .cat-grid{grid-template-columns:1fr;}
+    .card{padding:18px 14px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="logo">AUX WARS</div>
+  <div class="tagline">Who has the best taste?</div>
+
+  <!-- ══ HOME ══ -->
+  <div id="screen-home" class="screen active">
+    <div class="card">
+      <div class="card-title">🎵 Welcome</div>
+      <div class="card-sub">Play with friends from anywhere in the world</div>
+      <div id="home-error" class="error-box" style="display:none;"></div>
+      <input type="text" id="home-name" placeholder="Your name..." maxlength="20" style="margin-bottom:10px;"/>
+      <button class="btn btn-primary btn-full btn-lg" onclick="createRoom()" style="margin-bottom:10px;">
+        🏠 Create a Room
+      </button>
+      <hr class="divider" style="margin:10px 0;"/>
+      <div class="input-row" style="margin-bottom:0;">
+        <input type="text" id="home-code" placeholder="Room code (e.g. A3F9C2)" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;"/>
+        <button class="btn btn-secondary" onclick="joinRoom()">Join →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LOBBY ══ -->
+  <div id="screen-lobby" class="screen">
+    <div class="card">
+      <div class="room-code-display">
+        <div style="font-size:.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Share this code with friends</div>
+        <div class="code" id="lobby-code">------</div>
+        <div class="code-hint">Everyone types this at <strong style="color:var(--text);">the same website</strong></div>
+      </div>
+      <div class="card-title">👥 Players</div>
+      <div class="player-list-lobby" id="lobby-players"></div>
+      <div id="lobby-notice" class="notice" style="display:none;"></div>
+      <div id="lobby-host-controls" style="display:none;">
+        <hr class="divider"/>
+        <button class="btn btn-primary btn-full btn-lg" id="lobby-start-btn" onclick="startGame()">
+          ⚔️ Start Game
+        </button>
+        <p style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:8px;" id="lobby-status">
+          Waiting for players...
+        </p>
+      </div>
+      <div id="lobby-guest-msg" style="display:none;text-align:center;color:var(--muted);font-size:.85rem;margin-top:12px;">
+        ⏳ Waiting for the host to start…
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CATEGORY ══ -->
+  <div id="screen-category" class="screen">
+    <div class="card">
+      <div class="card-title">🎯 Pick the Category</div>
+      <div id="cat-host-view" style="display:none;">
+        <div class="card-sub">You're the host — choose how to pick the vibe</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;">
+          <button class="btn btn-primary btn-full btn-lg" onclick="goSpin()">🎰 Spin the Wheel</button>
+          <button class="btn btn-secondary btn-full btn-lg" onclick="toggleCatGrid()">🎯 Pick Manually</button>
+        </div>
+        <div id="cat-grid" class="cat-grid" style="display:none;"></div>
+      </div>
+      <div id="cat-guest-view" style="display:none;text-align:center;padding:20px 0;">
+        <div style="font-size:2rem;margin-bottom:10px;">⏳</div>
+        <div style="font-weight:600;margin-bottom:6px;">Waiting for host to pick category…</div>
+        <div style="color:var(--muted);font-size:.82rem;">Sit tight!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SPIN ══ -->
+  <div id="screen-spin" class="screen">
+    <div class="card" style="text-align:center;">
+      <div class="card-title">🎰 Spin It!</div>
+      <div class="card-sub">Host spins — everyone watches!</div>
+      <div class="wheel-wrap" style="margin:14px 0;">
+        <div style="font-size:1.6rem;">▼</div>
+        <canvas id="wheel" width="280" height="280"></canvas>
+      </div>
+      <button class="btn btn-primary btn-lg" id="spin-btn" onclick="spinWheel()" style="width:100%;">🎰 SPIN!</button>
+      <div id="spin-guest-msg" style="display:none;margin-top:10px;color:var(--muted);font-size:.82rem;">
+        👀 Watch the wheel spin…
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SUBMIT ══ -->
+  <div id="screen-submit" class="screen">
+    <div class="card">
+      <div class="badge">CATEGORY</div>
+      <div class="card-title" id="sub-category" style="color:var(--gold);margin-bottom:14px;"></div>
+
+      <!-- My turn to submit -->
+      <div id="sub-my-turn" style="display:none;">
+        <div class="player-box">
+          <div style="font-size:.68rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;">Your Song</div>
+          <div class="player-box-name" id="sub-my-name"></div>
+          <div style="color:var(--muted);font-size:.75rem;">Go find your track 🎧</div>
+        </div>
+        <p style="color:var(--muted);font-size:.83rem;margin-bottom:8px;">Open YouTube, find a song, paste the link:</p>
+        <input type="text" id="sub-url" placeholder="https://www.youtube.com/watch?v=..." style="margin-bottom:8px;"/>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <a href="https://www.youtube.com" target="_blank"
+            class="btn btn-secondary" style="flex:1;text-align:center;padding:10px;text-decoration:none;">
+            🔗 Open YouTube
+          </a>
+        </div>
+        <button class="btn btn-primary btn-full btn-lg" onclick="submitSong()">✅ Lock In My Song</button>
+        <div id="sub-error" class="error-box" style="display:none;margin-top:8px;"></div>
+      </div>
+
+      <!-- Waiting for others -->
+      <div id="sub-waiting" style="display:none;">
+        <div class="card-sub" style="margin-bottom:10px;">Waiting for everyone to submit their song…</div>
+        <div class="waiting-list" id="sub-waiting-list"></div>
+      </div>
+
+      <!-- Already submitted -->
+      <div id="sub-done" style="display:none;text-align:center;padding:16px 0;">
+        <div style="font-size:2rem;margin-bottom:8px;">✅</div>
+        <div style="font-weight:700;margin-bottom:4px;">Song locked in!</div>
+        <div style="color:var(--muted);font-size:.82rem;">Waiting for everyone else…</div>
+        <div class="waiting-list" id="sub-done-waiting" style="margin-top:14px;text-align:left;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LISTEN ══ -->
+  <div id="screen-listen" class="screen">
+    <div class="card" style="text-align:center;">
+      <div class="badge">🎵 NOW PLAYING</div>
+      <div class="card-title" style="margin-top:6px;" id="listen-title"></div>
+      <div class="card-sub" id="listen-counter"></div>
+
+      <div class="timer-wrap">
+        <svg width="110" height="110" style="transform:rotate(-90deg);">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="var(--border)" stroke-width="7"/>
+          <circle id="timer-ring" cx="55" cy="55" r="46" fill="none" stroke="var(--accent)"
+            stroke-width="7" stroke-linecap="round"
+            stroke-dasharray="289" stroke-dashoffset="0"/>
+        </svg>
+        <div id="timer-num" style="margin-top:-80px;font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--gold);line-height:1;">60</div>
+        <div style="margin-top:44px;color:var(--muted);font-size:.72rem;letter-spacing:1px;text-transform:uppercase;">seconds</div>
+      </div>
+
+      <div class="yt-box">
+        <span>🎵</span>
+        <a id="listen-yt-link" href="#" target="_blank">Opening in your browser…</a>
+        <button class="btn btn-secondary" onclick="openListenLink()" style="padding:6px 10px;font-size:.78rem;">Open</button>
+      </div>
+
+      <p style="color:var(--muted);font-size:.76rem;margin-bottom:14px;">Listen, feel the vibe — voting is next!</p>
+
+      <div id="listen-host-skip" style="display:none;">
+        <button class="btn btn-secondary btn-full" onclick="hostSkip()">⏭ Skip to Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VOTE ══ -->
+  <div id="screen-vote" class="screen">
+    <div class="card">
+      <div class="badge">🗳 VOTE</div>
+      <div class="card-title" style="margin-top:6px;">Cast Your Vote!</div>
+      <div class="card-sub">Anonymous — pick your favorite song. Can't vote for yourself!</div>
+      <div id="vote-options"></div>
+      <div id="vote-error" class="error-box" style="display:none;margin-bottom:8px;"></div>
+      <div id="vote-waiting" style="display:none;text-align:center;padding:14px 0;">
+        <div style="font-size:.82rem;color:var(--muted);">✅ Vote cast! Waiting for everyone…</div>
+        <div class="waiting-list" id="vote-waiting-list" style="text-align:left;margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RESULTS ══ -->
+  <div id="screen-results" class="screen">
+    <div class="card">
+      <div class="winner-crown">👑</div>
+      <div class="winner-name" id="results-winner"></div>
+      <div class="winner-sub" id="results-sub"></div>
+      <hr class="divider"/>
+      <div style="font-size:.68rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">
+        Final Standings
+      </div>
+      <div id="results-list"></div>
+      <hr class="divider"/>
+      <div id="results-host-btn" style="display:none;">
+        <button class="btn btn-gold btn-full btn-lg" onclick="playAgain()">🔁 Play Again</button>
+      </div>
+      <div id="results-guest-msg" style="display:none;text-align:center;color:var(--muted);font-size:.82rem;">
+        Waiting for host to start a new round…
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════
+//  SOCKET + STATE
+// ══════════════════════════════════════════════════════════
+const socket = io();
+
+let myName = '';
+let myRoom = '';
+let isHost = false;
+let currentRoom = null;
+let selectedVote = null;
+let currentListenUrl = '';
+let wheelAngle = 0;
+let wheelSpinning = false;
+let localTimer = null;
+let localTimerSec = 60;
+
+const CATEGORIES = [
+  "🔥 Hype Anthems","💔 Heartbreak Hits","🎉 Party Bangers",
+  "😤 Drill / Trap","🌊 Vibes Only","🕺 Old School",
+  "💿 R&B Smooth","🎸 Rock Legends","🌍 Latin Heat","🤯 Hidden Gems"
+];
+
+const SLICE_COLORS = [
+  "#ff2d55","#ff8c00","#ffc300","#00d4ff",
+  "#a855f7","#22c55e","#f43f5e","#3b82f6","#ec4899","#10b981"
+];
+
+// ══════════════════════════════════════════════════════════
+//  SOCKET EVENTS
+// ══════════════════════════════════════════════════════════
+socket.on('room_created', ({ code }) => {
+  myRoom = code;
+  document.getElementById('lobby-code').textContent = code;
+  showScreen('lobby');
+});
+
+socket.on('room_joined', ({ code }) => {
+  myRoom = code;
+  document.getElementById('lobby-code').textContent = code;
+  showScreen('lobby');
+});
+
+socket.on('error', (msg) => {
+  showError(msg);
+});
+
+socket.on('notice', (msg) => {
+  const el = document.getElementById('lobby-notice');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+});
+
+socket.on('room_update', (room) => {
+  currentRoom = room;
+  isHost = (myName === room.host);
+  handlePhase(room);
+});
+
+socket.on('play_song', ({ url, idx, total, videoId }) => {
+  currentListenUrl = url;
+  document.getElementById('listen-title').textContent = `🎵 Anonymous Song #${idx+1}`;
+  document.getElementById('listen-counter').textContent = `${idx+1} of ${total} songs`;
+  document.getElementById('listen-yt-link').href = url;
+  document.getElementById('listen-yt-link').textContent = 'Click to open on YouTube →';
+  // Auto-open
+  window.open(url, '_blank');
+});
+
+socket.on('timer_tick', ({ seconds }) => {
+  updateTimerUI(seconds);
+});
+
+// ══════════════════════════════════════════════════════════
+//  PHASE HANDLER
+// ══════════════════════════════════════════════════════════
+function handlePhase(room) {
+  switch(room.phase) {
+    case 'lobby':    renderLobby(room); showScreen('lobby'); break;
+    case 'category': renderCategory(room); showScreen(isHost ? 'category' : 'category'); break;
+    case 'submit':   renderSubmit(room); showScreen('submit'); break;
+    case 'listen':   renderListen(room); showScreen('listen'); break;
+    case 'vote':     renderVote(room); showScreen('vote'); break;
+    case 'results':  renderResults(room); showScreen('results'); break;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  HOME
+// ══════════════════════════════════════════════════════════
+document.getElementById('home-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') createRoom();
+});
+document.getElementById('home-code').addEventListener('keydown', e => {
+  if (e.key === 'Enter') joinRoom();
+});
+document.getElementById('home-code').addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase();
+});
+
+function createRoom() {
+  const name = document.getElementById('home-name').value.trim();
+  if (!name) { showHomeError('Enter your name first!'); return; }
+  myName = name;
+  socket.emit('create_room', { name });
+}
+
+function joinRoom() {
+  const name = document.getElementById('home-name').value.trim();
+  const code = document.getElementById('home-code').value.trim().toUpperCase();
+  if (!name) { showHomeError('Enter your name first!'); return; }
+  if (!code) { showHomeError('Enter a room code!'); return; }
+  myName = name;
+  socket.emit('join_room', { name, code });
+}
+
+function showHomeError(msg) {
+  const el = document.getElementById('home-error');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+function showError(msg) {
+  showHomeError(msg);
+  // Also try to show on current screen
+  alert('⚠️ ' + msg);
+}
+
+// ══════════════════════════════════════════════════════════
+//  LOBBY
+// ══════════════════════════════════════════════════════════
+function renderLobby(room) {
+  const list = document.getElementById('lobby-players');
+  list.innerHTML = room.players.map(p => `
+    <div class="player-item">
+      🎧 ${esc(p.name)}
+      ${p.name === room.host ? '<span class="host-badge">HOST</span>' : ''}
+    </div>
+  `).join('');
+
+  const hostCtrl = document.getElementById('lobby-host-controls');
+  const guestMsg = document.getElementById('lobby-guest-msg');
+  const startBtn = document.getElementById('lobby-start-btn');
+  const status = document.getElementById('lobby-status');
+
+  if (isHost) {
+    hostCtrl.style.display = 'block';
+    guestMsg.style.display = 'none';
+    const ok = room.players.length >= 2;
+    startBtn.disabled = !ok;
+    status.textContent = ok ? `${room.players.length} players ready!` : 'Need at least 2 players';
+  } else {
+    hostCtrl.style.display = 'none';
+    guestMsg.style.display = 'block';
+  }
+}
+
+function startGame() {
+  socket.emit('start_game');
+}
+
+// ══════════════════════════════════════════════════════════
+//  CATEGORY
+// ══════════════════════════════════════════════════════════
+function renderCategory(room) {
+  document.getElementById('cat-host-view').style.display = isHost ? 'block' : 'none';
+  document.getElementById('cat-guest-view').style.display = isHost ? 'none' : 'block';
+
+  if (isHost) {
+    const grid = document.getElementById('cat-grid');
+    grid.innerHTML = CATEGORIES.map(c =>
+      `<button class="cat-btn" onclick="pickCategory('${esc(c)}')">${c}</button>`
+    ).join('');
+  }
+}
+
+function toggleCatGrid() {
+  const g = document.getElementById('cat-grid');
+  g.style.display = g.style.display === 'none' ? 'grid' : 'none';
+}
+
+function pickCategory(cat) {
+  socket.emit('pick_category', { category: cat });
+}
+
+function goSpin() {
+  showScreen('spin');
+  drawWheel(0);
+  document.getElementById('spin-btn').style.display = isHost ? 'block' : 'none';
+  document.getElementById('spin-guest-msg').style.display = isHost ? 'none' : 'block';
+}
+
+// ══════════════════════════════════════════════════════════
+//  WHEEL
+// ══════════════════════════════════════════════════════════
+function drawWheel(angle) {
+  const canvas = document.getElementById('wheel');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, cx = W/2, r = cx - 5;
+  const slice = (2*Math.PI)/CATEGORIES.length;
+  ctx.clearRect(0,0,W,W);
+  CATEGORIES.forEach((cat,i) => {
+    const s = angle + i*slice, e = s + slice;
+    ctx.beginPath(); ctx.moveTo(cx,cx);
+    ctx.arc(cx,cx,r,s,e); ctx.closePath();
+    ctx.fillStyle = SLICE_COLORS[i]; ctx.fill();
+    ctx.strokeStyle = '#080810'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.save();
+    ctx.translate(cx,cx); ctx.rotate(s+slice/2);
+    ctx.textAlign='right'; ctx.fillStyle='rgba(255,255,255,.95)';
+    ctx.font='bold 10px DM Sans,sans-serif';
+    ctx.shadowColor='rgba(0,0,0,.7)'; ctx.shadowBlur=4;
+    const lbl = cat.length > 13 ? cat.slice(0,12)+'…' : cat;
+    ctx.fillText(lbl, r-10, 4);
+    ctx.restore();
+  });
+  ctx.beginPath(); ctx.arc(cx,cx,18,0,2*Math.PI);
+  ctx.fillStyle='#080810'; ctx.fill();
+  ctx.strokeStyle='var(--gold)'; ctx.lineWidth=3; ctx.stroke();
+}
+
+function spinWheel() {
+  if (!isHost || wheelSpinning) return;
+  wheelSpinning = true;
+  document.getElementById('spin-btn').disabled = true;
+  const vel = { v: 0.20 + Math.random()*0.12 };
+  function frame() {
+    wheelAngle += vel.v;
+    vel.v *= 0.993;
+    drawWheel(wheelAngle);
+    if (vel.v > 0.001) { requestAnimationFrame(frame); }
+    else {
+      wheelSpinning = false;
+      document.getElementById('spin-btn').disabled = false;
+      const n = CATEGORIES.length;
+      const slice = (2*Math.PI)/n;
+      const norm = ((-wheelAngle%(2*Math.PI))+Math.PI*4)%(2*Math.PI);
+      const top = (norm+Math.PI*1.5)%(2*Math.PI);
+      const idx = Math.floor(top/slice)%n;
+      const result = CATEGORIES[idx];
+      setTimeout(() => {
+        if (confirm(`🎯 Category: ${result}\n\nReady to lock it in?`)) {
+          socket.emit('pick_category', { category: result });
+        }
+      }, 300);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ══════════════════════════════════════════════════════════
+//  SUBMIT
+// ══════════════════════════════════════════════════════════
+let alreadySubmitted = false;
+
+function renderSubmit(room) {
+  document.getElementById('sub-category').textContent = room.category;
+  alreadySubmitted = room.submittedPlayers.includes(myName);
+
+  if (alreadySubmitted) {
+    document.getElementById('sub-my-turn').style.display = 'none';
+    document.getElementById('sub-waiting').style.display = 'none';
+    document.getElementById('sub-done').style.display = 'block';
+    renderWaitingList('sub-done-waiting', room);
+  } else {
+    document.getElementById('sub-my-turn').style.display = 'block';
+    document.getElementById('sub-waiting').style.display = 'none';
+    document.getElementById('sub-done').style.display = 'none';
+    document.getElementById('sub-my-name').textContent = '🎧 ' + myName;
+  }
+}
+
+function renderWaitingList(elId, room) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = room.players.map(p => {
+    const done = room.submittedPlayers.includes(p.name);
+    return `<div class="waiting-item">
+      <span>${esc(p.name)}</span>
+      <span class="${done ? 'status-done' : 'status-wait'}">${done ? '✅ Ready' : '⏳ Picking…'}</span>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('sub-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitSong();
+});
+
+function submitSong() {
+  const url = document.getElementById('sub-url').value.trim();
+  if (!url || url === 'https://www.youtube.com/watch?v=...') {
+    showSubError('Paste a YouTube link first!'); return;
+  }
+  socket.emit('submit_song', { url });
+  document.getElementById('sub-error').style.display = 'none';
+}
+
+function showSubError(msg) {
+  const el = document.getElementById('sub-error');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════════
+//  LISTEN
+// ══════════════════════════════════════════════════════════
+function renderListen(room) {
+  document.getElementById('listen-host-skip').style.display = isHost ? 'block' : 'none';
+  updateTimerUI(room.timerSeconds || 60);
+}
+
+function updateTimerUI(s) {
+  document.getElementById('timer-num').textContent = s;
+  const ring = document.getElementById('timer-ring');
+  const circumference = 2 * Math.PI * 46;
+  ring.style.strokeDashoffset = circumference * (1 - s/60);
+  ring.style.stroke = s > 20 ? 'var(--accent)' : 'var(--gold)';
+}
+
+function openListenLink() {
+  if (currentListenUrl) window.open(currentListenUrl, '_blank');
+}
+
+function hostSkip() {
+  socket.emit('next_track');
+}
+
+// ══════════════════════════════════════════════════════════
+//  VOTE
+// ══════════════════════════════════════════════════════════
+let alreadyVoted = false;
+
+function renderVote(room) {
+  alreadyVoted = room.votedPlayers.includes(myName);
+  selectedVote = null;
+
+  const opts = document.getElementById('vote-options');
+  const waiting = document.getElementById('vote-waiting');
+  const waitList = document.getElementById('vote-waiting-list');
+
+  if (alreadyVoted) {
+    opts.innerHTML = '';
+    waiting.style.display = 'block';
+    waitList.innerHTML = room.players.map(p => {
+      const done = room.votedPlayers.includes(p.name);
+      return `<div class="waiting-item">
+        <span>${esc(p.name)}</span>
+        <span class="${done?'status-done':'status-wait'}">${done?'✅ Voted':'⏳ Voting…'}</span>
+      </div>`;
+    }).join('');
+  } else {
+    waiting.style.display = 'none';
+    opts.innerHTML = room.players
+      .filter(p => p.name !== myName)
+      .map((p,i) => {
+        const songNum = room.listenOrder.indexOf(p.name) + 1;
+        return `<div class="vote-option" onclick="selectVote(this,'${esc(p.name)}')">
+          <span>🎵 Song #${songNum}</span>
+          <span style="color:var(--muted);font-size:.78rem;">(Player ${i+1})</span>
+          <span class="vote-check">✓</span>
+        </div>
+        <button class="btn btn-primary btn-full" id="vote-submit-${i}"
+          onclick="submitVote('${esc(p.name)}')" style="display:none;margin-bottom:8px;">
+          Vote for Song #${songNum} ✓
+        </button>`;
+      }).join('') +
+      `<button class="btn btn-primary btn-full btn-lg" id="vote-submit-btn"
+        onclick="doSubmitVote()" disabled style="margin-top:4px;">Submit My Vote</button>`;
+  }
+}
+
+function selectVote(el, name) {
+  document.querySelectorAll('.vote-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedVote = name;
+  const btn = document.getElementById('vote-submit-btn');
+  if (btn) btn.disabled = false;
+}
+
+function doSubmitVote() {
+  if (!selectedVote) return;
+  document.getElementById('vote-error').style.display = 'none';
+  socket.emit('cast_vote', { votedFor: selectedVote });
+}
+
+// ══════════════════════════════════════════════════════════
+//  RESULTS
+// ══════════════════════════════════════════════════════════
+function renderResults(room) {
+  if (!room.tally || !room.tally.length) return;
+  const [winnerName, winnerVotes] = room.tally[0];
+  const maxV = winnerVotes;
+
+  document.getElementById('results-winner').textContent = winnerName + ' WINS!';
+  document.getElementById('results-sub').textContent =
+    `${winnerVotes} vote${winnerVotes!==1?'s':''} • Category: ${room.category}`;
+
+  const medals = ['🥇','🥈','🥉'];
+  const list = document.getElementById('results-list');
+  list.innerHTML = room.tally.map(([name,votes],i) => `
+    <div class="result-row">
+      <div class="result-top">
+        <div class="result-name">${medals[i]||'#'+(i+1)} ${esc(name)}</div>
+        <div class="result-votes">${votes} vote${votes!==1?'s':''}</div>
+      </div>
+      <div class="result-bar-bg">
+        <div class="result-bar-fill" id="rbar-${i}"></div>
+      </div>
+      ${room.submissions && room.submissions[name]
+        ? `<a href="${esc(room.submissions[name])}" target="_blank" class="result-link">🔗 Their song</a>` : ''}
+    </div>
+  `).join('');
+
+  document.getElementById('results-host-btn').style.display = isHost ? 'block' : 'none';
+  document.getElementById('results-guest-msg').style.display = isHost ? 'none' : 'block';
+
+  setTimeout(() => {
+    room.tally.forEach(([,votes],i) => {
+      const bar = document.getElementById('rbar-'+i);
+      if (bar) bar.style.width = (maxV>0?(votes/maxV)*100:0)+'%';
+    });
+  }, 200);
+}
+
+function playAgain() {
+  socket.emit('play_again');
+}
+
+// ══════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Init
+drawWheel(0);
+</script>
+</body>
+</html>
